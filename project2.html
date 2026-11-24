@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hearthlist — Housewarming Gift Registry & Party Checklist</title>
+<meta name="description" content="Hearthlist helps new homeowners build a smart housewarming gift registry and a party checklist — so you never end up with three toaster ovens again.">
+<meta name="theme-color" content="#FAF6F0">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   1. DESIGN TOKENS  (CSS Variables)
+   ============================================================ */
+:root{
+  --bg:#FAF6F0;
+  --bg-alt:#F2EBE1;
+  --surface:#FFFFFF;
+  --surface-2:#FBF8F4;
+  --ink:#1B1714;
+  --ink-2:#4E4741;
+  --muted:#8B8079;
+  --line:#E8DFD4;
+  --accent:#C2410C;
+  --accent-2:#EA6A32;
+  --accent-soft:#FDEDE3;
+  --sage:#3F6B52;
+  --sage-soft:#E5EFE8;
+  --shadow-sm:0 1px 2px rgba(27,23,20,.05), 0 4px 14px rgba(27,23,20,.045);
+  --shadow-lg:0 24px 60px -24px rgba(27,23,20,.28);
+  --radius:18px;
+  --radius-sm:12px;
+  --ring-track:color-mix(in srgb, var(--ink) 10%, transparent);
+  --maxw:1180px;
+  --ease:cubic-bezier(.22,.7,.3,1);
+}
+
+[data-theme="dark"]{
+  --bg:#12100E;
+  --bg-alt:#1A1613;
+  --surface:#1C1815;
+  --surface-2:#221D19;
+  --ink:#F6F1EA;
+  --ink-2:#CFC5BA;
+  --muted:#948A81;
+  --line:#2E2823;
+  --accent:#F97316;
+  --accent-2:#FB923C;
+  --accent-soft:#2B1B11;
+  --sage:#7FB894;
+  --sage-soft:#16241C;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.45), 0 4px 16px rgba(0,0,0,.35);
+  --shadow-lg:0 28px 70px -24px rgba(0,0,0,.8);
+}
+
+/* Room tile gradients */
+[data-cat="kitchen"]{--tile-a:#FFE9D8;--tile-b:#FFD0B0}
+[data-cat="bedroom"]{--tile-a:#EBE7FF;--tile-b:#D6CDFF}
+[data-cat="living"] {--tile-a:#E4F1E8;--tile-b:#C6E4D2}
+[data-cat="bath"]   {--tile-a:#DDEEFB;--tile-b:#C2E0F6}
+[data-cat="entry"]  {--tile-a:#FDEFD2;--tile-b:#FADFA6}
+[data-cat="utility"]{--tile-a:#EDEAE6;--tile-b:#DCD6CF}
+
+[data-theme="dark"] [data-cat="kitchen"]{--tile-a:#3A2418;--tile-b:#291A10}
+[data-theme="dark"] [data-cat="bedroom"]{--tile-a:#251F3D;--tile-b:#191430}
+[data-theme="dark"] [data-cat="living"] {--tile-a:#1B2C22;--tile-b:#12211A}
+[data-theme="dark"] [data-cat="bath"]   {--tile-a:#16283A;--tile-b:#0F1D2B}
+[data-theme="dark"] [data-cat="entry"]  {--tile-a:#332A16;--tile-b:#241E0F}
+[data-theme="dark"] [data-cat="utility"]{--tile-a:#26221E;--tile-b:#1A1714}
+
+/* ============================================================
+   2. RESET / BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background .45s var(--ease), color .45s var(--ease);
+}
+body::before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(700px 420px at 12% -8%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
+    radial-gradient(620px 400px at 92% 4%, color-mix(in srgb, var(--sage) 10%, transparent), transparent 72%);
+}
+img,svg{display:block;max-width:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:600;line-height:1.12;letter-spacing:-.02em}
+::selection{background:var(--accent);color:#fff}
+
+.container{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:clamp(18px,4vw,32px);position:relative;z-index:1}
+
+/* ============================================================
+   3. HEADER / NAV
+   ============================================================ */
+.site-header{
+  position:sticky;top:0;z-index:70;
+  backdrop-filter:blur(16px) saturate(1.4);
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);
+  background:color-mix(in srgb, var(--bg) 84%, transparent);
+  border-bottom:1px solid var(--line);
+  transition:background .45s var(--ease), border-color .45s var(--ease);
+}
+.nav{display:flex;align-items:center;gap:22px;height:70px}
+.brand{display:flex;align-items:center;gap:11px;font-family:'Fraunces',serif;font-weight:700;font-size:1.22rem;letter-spacing:-.03em}
+.brand-mark{
+  width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(140deg,var(--accent),var(--accent-2));
+  box-shadow:0 8px 20px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+  flex:none;
+}
+.brand-mark svg{width:21px;height:21px;stroke:#fff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{
+  padding:8px 14px;border-radius:999px;font-size:.9rem;font-weight:500;color:var(--ink-2);
+  transition:background .25s, color .25s;
+}
+.nav-links a:hover{background:var(--bg-alt);color:var(--ink)}
+.theme-toggle{
+  width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
+  display:grid;place-items:center;background:var(--surface);
+  transition:transform .3s var(--ease), border-color .3s, background .3s;
+}
+.theme-toggle:hover{transform:rotate(-14deg) scale(1.05);border-color:var(--accent)}
+.theme-toggle svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+[data-theme="light"] .icon-moon{display:none}
+[data-theme="dark"] .icon-sun{display:none}
+
+/* ============================================================
+   4. BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 22px;border-radius:999px;font-weight:600;font-size:.92rem;
+  border:1px solid transparent;white-space:nowrap;
+  transition:transform .25s var(--ease), box-shadow .25s, background .25s, color .25s, border-color .25s;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{
+  background:linear-gradient(140deg,var(--accent),var(--accent-2));color:#fff;
+  box-shadow:0 10px 26px -12px color-mix(in srgb, var(--accent) 85%, transparent);
+}
+.btn-primary:hover{box-shadow:0 16px 34px -12px color-mix(in srgb, var(--accent) 90%, transparent);transform:translateY(-2px)}
+.btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.btn-sm{padding:8px 15px;font-size:.82rem}
+
+/* ============================================================
+   5. HERO
+   ============================================================ */
+.hero{padding:clamp(48px,7vw,92px) 0 clamp(40px,5vw,64px)}
+.hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:clamp(32px,5vw,64px);align-items:center}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:7px 15px 7px 11px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--line);
+  font-size:.78rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);
+  box-shadow:var(--shadow-sm);
+}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--sage);position:relative;flex:none}
+.pulse::after{
+  content:"";position:absolute;inset:-4px;border-radius:50%;
+  border:2px solid var(--sage);opacity:.55;animation:pulse 2s ease-out infinite;
+}
+@keyframes pulse{0%{transform:scale(.6);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+
+.hero h1{
+  font-size:clamp(2.2rem,5.2vw,3.7rem);
+  margin:22px 0 0;
+  letter-spacing:-.035em;
+}
+.hero h1 em{
+  font-style:italic;font-weight:400;
+  color:var(--accent);
+  position:relative;white-space:nowrap;
+}
+.hero h1 em::after{
+  content:"";position:absolute;left:0;right:0;bottom:.05em;height:.32em;
+  background:color-mix(in srgb, var(--accent) 22%, transparent);
+  border-radius:4px;z-index:-1;
+}
+.lede{font-size:clamp(1rem,1.6vw,1.12rem);color:var(--ink-2);max-width:52ch;margin-top:20px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+
+.hero-stats{display:flex;flex-wrap:wrap;gap:clamp(20px,4vw,44px);margin-top:40px;padding-top:28px;border-top:1px solid var(--line)}
+.hstat b{display:block;font-family:'Fraunces',serif;font-size:1.85rem;line-height:1;letter-spacing:-.03em}
+.hstat span{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+
+/* Floating preview card */
+.hero-card{position:relative;perspective:1200px}
+.float-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:24px;
+  padding:26px;box-shadow:var(--shadow-lg);
+  transform:rotateY(-7deg) rotateX(3deg);
+  transition:transform .7s var(--ease);
+  animation:floaty 7s ease-in-out infinite;
+}
+.hero-card:hover .float-card{transform:rotateY(0) rotateX(0)}
+@keyframes floaty{0%,100%{translate:0 0}50%{translate:0 -12px}}
+.fc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.fc-head h3{font-size:1.02rem}
+.fc-pct{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--accent)}
+.fc-sub{font-size:.8rem;color:var(--muted);margin-bottom:18px}
+.bar{height:9px;border-radius:99px;background:var(--ring-track);overflow:hidden}
+.bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .8s var(--ease)}
+.fc-list{display:grid;gap:2px;margin-top:20px}
+.fc-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.fc-row:last-child{border-bottom:0}
+.fc-emoji{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:1.15rem;flex:none;
+  background:linear-gradient(140deg,var(--tile-a),var(--tile-b));
+}
+.fc-row p{font-size:.86rem;font-weight:500;flex:1}
+.pill{
+  font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:4px 10px;border-radius:999px;
+}
+.pill.ok{background:var(--sage-soft);color:var(--sage)}
+.pill.warn{background:var(--accent-soft);color:var(--accent)}
+
+.float-badge{
+  position:absolute;bottom:-18px;left:-16px;
+  background:var(--ink);color:var(--bg);
+  padding:12px 18px;border-radius:14px;font-size:.82rem;font-weight:600;
+  display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);
+  animation:floaty 7s ease-in-out infinite .8s;
+}
+.float-badge svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* ============================================================
+   6. SECTIONS
+   ============================================================ */
+section{scroll-margin-top:88px}
+.section{padding:clamp(46px,6vw,80px) 0}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:34px}
+.sec-head h2{font-size:clamp(1.75rem,3.4vw,2.55rem);letter-spacing:-.03em}
+.sec-head p{color:var(--ink-2);max-width:56ch;margin-top:10px;font-size:.98rem}
+.kicker{
+  display:inline-block;font-size:.76rem;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:10px;
+}
+
+/* ============================================================
+   7. TOOLBAR
+   ============================================================ */
+.toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
+  font-size:.84rem;font-weight:500;color:var(--ink-2);
+  transition:all .25s var(--ease);
+}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.chip .count{opacity:.55;font-size:.78em;margin-left:5px}
+
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{position:relative}
+.search svg{
+  position:absolute;left:13px;top:50%;translate:0 -50%;width:16px;height:16px;
+  stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none;
+}
+.search input{
+  width:clamp(150px,26vw,230px);padding:11px 14px 11px 38px;
+  border-radius:12px;border:1px solid var(--line);background:var(--surface);
+  font-size:.88rem;transition:border-color .25s, box-shadow .25s;
+}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 15%,transparent)}
+select{
+  padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);
+  font-size:.88rem;cursor:pointer;transition:border-color .25s;
+}
+select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 15%,transparent)}
+
+.guard-note{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:11px 16px;border-radius:12px;margin-bottom:26px;
+  background:var(--sage-soft);border:1px solid color-mix(in srgb,var(--sage) 25%,transparent);
+  font-size:.84rem;color:var(--sage);font-weight:500;
+}
+.guard-note svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ============================================================
+   8. GIFT GRID
+   ============================================================ */
+.gift-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:20px}
+
+.gift-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  overflow:hidden;display:flex;flex-direction:column;position:relative;
+  box-shadow:var(--shadow-sm);
+  transition:transform .4s var(--ease), box-shadow .4s var(--ease), border-color .4s;
+  animation:cardIn .5s var(--ease) backwards;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.gift-card:hover{
+  transform:translateY(-6px);
+  box-shadow:var(--shadow-lg);
+  border-color:color-mix(in srgb,var(--accent) 35%,var(--line));
+}
+
+.gift-tile{
+  position:relative;aspect-ratio:16/10;display:grid;place-items:center;
+  background:linear-gradient(140deg,var(--tile-a),var(--tile-b));
+  overflow:hidden;
+}
+.gift-tile::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 70% 20%, rgba(255,255,255,.55), transparent 60%);
+  opacity:.6;pointer-events:none;
+}
+.gift-emoji{font-size:3rem;line-height:1;transition:transform .45s var(--ease), opacity .45s;filter:drop-shadow(0 6px 12px rgba(0,0,0,.14))}
+.gift-card:hover .gift-emoji{transform:scale(1.12) rotate(-5deg)}
+.gift-card.is-claimed .gift-emoji{opacity:.38;transform:scale(.9)}
+
+.gift-badge{
+  position:absolute;top:11px;left:11px;z-index:2;
+  font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 11px;border-radius:999px;
+  background:rgba(255,255,255,.92);color:#3F6B52;
+  backdrop-filter:blur(6px);
+}
+.gift-card.is-claimed .gift-badge{background:rgba(63,107,82,.95);color:#fff}
+
+.icon-btn{
+  position:absolute;top:9px;right:9px;z-index:2;
+  width:28px;height:28px;border-radius:9px;display:grid;place-items:center;
+  background:rgba(255,255,255,.85);color:#57504A;font-size:.8rem;font-weight:700;
+  opacity:0;transform:scale(.8);
+  transition:opacity .25s, transform .25s, background .25s, color .25s;
+  backdrop-filter:blur(6px);
+}
+.gift-card:hover .icon-btn,.gift-card:focus-within .icon-btn{opacity:1;transform:scale(1)}
+.icon-btn:hover{background:#C2410C;color:#fff}
+
+.gift-body{padding:16px 17px 17px;display:flex;flex-direction:column;flex:1;gap:4px}
+.gift-cat{font-size:.7rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.gift-body h3{font-size:1.02rem;letter-spacing:-.015em;line-height:1.28;margin-top:2px}
+.gift-note{font-size:.79rem;color:var(--muted);margin-top:2px;min-height:1em}
+.gift-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:14px}
+.price{font-family:'Fraunces',serif;font-size:1.16rem;font-weight:700;letter-spacing:-.02em}
+.price small{font-size:.62em;font-weight:600;color:var(--muted);letter-spacing:0}
+
+.btn-claim{
+  padding:8px 15px;border-radius:999px;font-size:.79rem;font-weight:600;
+  background:var(--accent-soft);color:var(--accent);border:1px solid transparent;
+  transition:all .25s var(--ease);
+}
+.btn-claim:hover{background:var(--accent);color:#fff;transform:translateY(-1px)}
+.gift-card.is-claimed .btn-claim{background:transparent;color:var(--sage);border-color:color-mix(in srgb,var(--sage) 35%,transparent)}
+.gift-card.is-claimed .btn-claim:hover{background:var(--sage);color:#fff}
+
+.empty{
+  grid-column:1/-1;text-align:center;padding:64px 20px;
+  border:1.5px dashed var(--line);border-radius:var(--radius);color:var(--muted);
+}
+.empty span{font-size:2.6rem;display:block;margin-bottom:12px}
+
+/* ============================================================
+   9. CHECKLIST
+   ============================================================ */
+.checklist-wrap{
+  display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start;
+}
+.progress-panel{
+  position:sticky;top:96px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px;box-shadow:var(--shadow-sm);text-align:center;
+}
+.ring-wrap{position:relative;width:150px;height:150px;margin:0 auto 6px}
+.ring{width:150px;height:150px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:11;stroke-linecap:round}
+.ring .track{stroke:var(--ring-track)}
+.ring .value{stroke:url(#ringGrad);transition:stroke-dashoffset .9s var(--ease)}
+.ring-label{
+  position:absolute;inset:0;display:grid;place-content:center;gap:2px;
+}
+.ring-label b{font-family:'Fraunces',serif;font-size:2rem;line-height:1;letter-spacing:-.03em}
+.ring-label span{font-size:.7rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}
+.progress-panel h3{font-size:1.1rem;margin-top:14px}
+.progress-panel p{font-size:.83rem;color:var(--muted);margin-top:6px}
+
+.task-add{display:flex;gap:8px;margin-top:20px}
+.task-add input{
+  flex:1;min-width:0;padding:10px 13px;border-radius:10px;border:1px solid var(--line);
+  background:var(--surface-2);font-size:.85rem;transition:border-color .25s, box-shadow .25s;
+}
+.task-add input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent)}
+.task-add select{padding:10px 10px;font-size:.8rem;border-radius:10px}
+
+.task-groups{display:grid;gap:18px}
+.task-group{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 22px;box-shadow:var(--shadow-sm);
+  transition:border-color .3s;
+}
+.task-group:hover{border-color:color-mix(in srgb,var(--accent) 22%,var(--line))}
+.tg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.tg-head h4{font-family:'Fraunces',serif;font-size:1.02rem;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.tg-head h4 i{font-style:normal;font-size:1rem}
+.tg-count{font-size:.74rem;font-weight:700;color:var(--muted);background:var(--bg-alt);padding:3px 10px;border-radius:999px}
+
+.task-list{list-style:none;display:grid;gap:2px}
+.task{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 4px;border-radius:9px;transition:background .2s}
+.task:hover{background:var(--surface-2)}
+.task label{display:flex;align-items:center;gap:11px;flex:1;cursor:pointer;min-width:0}
+.task input{position:absolute;opacity:0;width:0;height:0}
+.box{
+  width:19px;height:19px;border-radius:6px;border:1.8px solid var(--line);
+  display:grid;place-items:center;flex:none;transition:all .25s var(--ease);
+  background:var(--surface);
+}
+.box::after{
+  content:"";width:9px;height:5px;border-left:2.2px solid #fff;border-bottom:2.2px solid #fff;
+  transform:rotate(-45deg) scale(0);transition:transform .25s var(--ease);margin-top:-2px;
+}
+.task input:checked + .box{background:var(--sage);border-color:var(--sage)}
+.task input:checked + .box::after{transform:rotate(-45deg) scale(1)}
+.task input:focus-visible + .box{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.task-text{font-size:.9rem;transition:color .25s, opacity .25s;overflow-wrap:anywhere}
+.task.done .task-text{text-decoration:line-through;color:var(--muted);opacity:.75}
+.task-del{
+  opacity:0;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;
+  font-size:.72rem;color:var(--muted);transition:opacity .2s, background .2s, color .2s;flex:none;
+}
+.task:hover .task-del,.task:focus-within .task-del{opacity:1}
+.task-del:hover{background:var(--accent-soft);color:var(--accent)}
+
+/* ============================================================
+   10. HOW IT WORKS
+   ============================================================ */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.step{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+  transition:transform .35s var(--ease), box-shadow .35s;
+}
+.step:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.step-num{
+  font-family:'Fraunces',serif;font-size:3.1rem;font-weight:700;line-height:1;
+  color:color-mix(in srgb,var(--accent) 22%,transparent);
+  position:absolute;top:12px;right:18px;letter-spacing:-.04em;
+}
+.step h3{font-size:1.02rem;margin-bottom:8px}
+.step p{font-size:.87rem;color:var(--ink-2)}
+
+/* ============================================================
+   11. DIALOG / MODAL
+   ============================================================ */
+dialog{
+  border:none;padding:0;background:transparent;max-width:min(520px,94vw);width:100%;
+  color:var(--ink);
+}
+dialog::backdrop{background:rgba(20,16,14,.5);backdrop-filter:blur(4px)}
+.modal{
+  background:var(--surface);border:1px solid var(--line);border-radius:22px;
+  padding:clamp(22px,4vw,32px);box-shadow:var(--shadow-lg);
+  animation:modalIn .35s var(--ease);
+}
+@keyframes modalIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.modal-head h3{font-size:1.35rem}
+.modal-head p{font-size:.85rem;color:var(--muted);margin-top:5px}
+.modal-close{
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;
+  border:1px solid var(--line);color:var(--ink-2);transition:all .2s;
+}
+.modal-close:hover{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+
+.field{margin-bottom:15px}
+.field label{display:block;font-size:.79rem;font-weight:600;margin-bottom:6px;color:var(--ink-2);letter-spacing:.01em}
+.field input,.field select,.field textarea{
+  width:100%;padding:11px 14px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface-2);font-size:.9rem;
+  transition:border-color .25s, box-shadow .25s, background .25s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--accent);background:var(--surface);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 14%,transparent);
+}
+.field input:invalid:not(:placeholder-shown){border-color:#DC2626}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:.75rem;color:var(--muted);margin-top:5px}
+
+.emoji-row{display:flex;flex-wrap:wrap;gap:7px}
+.emoji-pick{
+  width:40px;height:40px;border-radius:11px;border:1.5px solid var(--line);
+  display:grid;place-items:center;font-size:1.15rem;background:var(--surface-2);
+  transition:all .22s var(--ease);
+}
+.emoji-pick:hover{transform:translateY(-2px) scale(1.06)}
+.emoji-pick[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+
+.warn-box{
+  display:none;gap:10px;align-items:flex-start;
+  padding:12px 14px;border-radius:11px;margin-bottom:15px;font-size:.83rem;
+  background:var(--accent-soft);color:var(--accent);font-weight:500;
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+}
+.warn-box.show{display:flex}
+.warn-box svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;flex:none;margin-top:2px}
+
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px}
+
+/* ============================================================
+   12. TOAST
+   ============================================================ */
+.toast-wrap{position:fixed;bottom:26px;left:50%;translate:-50% 0;z-index:200;display:grid;gap:10px;width:max-content;max-width:92vw}
+.toast{
+  display:flex;align-items:center;gap:11px;
+  background:var(--ink);color:var(--bg);
+  padding:13px 20px;border-radius:14px;font-size:.86rem;font-weight:500;
+  box-shadow:var(--shadow-lg);
+  animation:toastIn .4s var(--ease), toastOut .4s var(--ease) 3s forwards;
+}
+.toast svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex:none}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(14px) scale(.96)}}
+
+/* ============================================================
+   13. FOOTER
+   ============================================================ */
+.site-footer{
+  border-top:1px solid var(--line);margin-top:40px;padding:44px 0 34px;
+  background:color-mix(in srgb,var(--bg-alt) 60%,var(--bg));
+}
+.foot-grid{display:flex;justify-content:space-between;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.foot-grid p{font-size:.85rem;color:var(--muted);max-width:44ch;margin-top:10px}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;font-size:.85rem;color:var(--ink-2)}
+.foot-links a:hover{color:var(--accent)}
+.reset-btn{font-size:.8rem;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.reset-btn:hover{color:var(--accent)}
+
+/* ============================================================
+   14. SCROLL REVEAL
+   ============================================================ */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .75s var(--ease), transform .75s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+
+/* ============================================================
+   15. RESPONSIVE
+   ============================================================ */
+@media (max-width:960px){
+  .hero-grid{grid-template-columns:1fr;gap:44px}
+  .hero-card{max-width:440px;margin-inline:auto}
+  .float-card{transform:none}
+  .float-badge{left:auto;right:-8px;bottom:-16px}
+  .checklist-wrap{grid-template-columns:1fr}
+  .progress-panel{position:static;display:grid;grid-template-columns:150px 1fr;gap:20px;text-align:left;align-items:center}
+  .ring-wrap{margin:0}
+  .progress-panel .task-add{grid-column:1/-1;margin-top:0}
+}
+@media (max-width:720px){
+  .nav{height:62px;gap:12px}
+  .nav-links a{padding:7px 10px;font-size:.82rem}
+  .brand span{display:none}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .tools{width:100%}
+  .search input{width:100%}
+  .search{flex:1}
+  .hero-stats{gap:22px}
+  .hstat b{font-size:1.5rem}
+}
+@media (max-width:560px){
+  .nav-links a:nth-child(3){display:none}
+  .gift-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+  .gift-emoji{font-size:2.2rem}
+  .gift-body h3{font-size:.92rem}
+  .gift-foot{flex-direction:column;align-items:flex-start;gap:8px}
+  .btn-claim{width:100%}
+  .progress-panel{grid-template-columns:1fr;text-align:center}
+  .ring-wrap{margin-inline:auto}
+  .field-row{grid-template-columns:1fr}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ======================= HEADER ======================= -->
+<header class="site-header">
+  <div class="container nav">
+    <a href="#top" class="brand" aria-label="Hearthlist home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg>
+      </span>
+      <span>Hearthlist</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#registry">Registry</a>
+      <a href="#checklist">Checklist</a>
+      <a href="#how">How it works</a>
+    </nav>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ======================= HERO ======================= -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Registry &amp; checklist · live</span>
+
+        <h1>Everything for your <em>new home</em>, without the three toaster ovens.</h1>
+
+        <p class="lede">
+          Hearthlist is a smart gift registry for housewarming parties. It watches for
+          duplicates, shows guests exactly what's still missing, and keeps your party
+          checklist on track — from the first invite to the last plate.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#registry">
+            Browse the registry
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="#checklist">Party checklist</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hstat"><b id="statGifts">0</b><span>Gifts listed</span></div>
+          <div class="hstat"><b id="statClaimed">0</b><span>Claimed</span></div>
+          <div class="hstat"><b id="statTasks">0</b><span>Tasks left</span></div>
+        </div>
+      </div>
+
+      <!-- Floating preview card -->
+      <div class="hero-card">
+        <div class="float-card">
+          <div class="fc-head">
+            <h3>Registry progress</h3>
+            <span class="fc-pct" id="previewPct">0%</span>
+          </div>
+          <p class="fc-sub">No duplicates detected · updated live</p>
+          <div class="bar"><i id="previewBar" style="width:0%"></i></div>
+
+          <div class="fc-list">
+            <div class="fc-row" data-cat="kitchen">
+              <span class="fc-emoji">🥣</span>
+              <p>Stand Mixer</p>
+              <span class="pill ok">Claimed</span>
+            </div>
+            <div class="fc-row" data-cat="living">
+              <span class="fc-emoji">🪴</span>
+              <p>Indoor Plant Set</p>
+              <span class="pill warn">Needed</span>
+            </div>
+            <div class="fc-row" data-cat="bath">
+              <span class="fc-emoji">🛁</span>
+              <p>Bath Towel Set</p>
+              <span class="pill ok">Claimed</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="float-badge">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          Duplicate guard active
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= REGISTRY ======================= -->
+  <section class="section" id="registry">
+    <div class="container">
+      <div class="sec-head reveal">
+        <div>
+          <span class="kicker">The registry</span>
+          <h2>Gifts your home actually needs</h2>
+          <p>Filter by room, search, or sort by price. Claim a gift to reserve it — everyone else instantly sees it's taken, so you never get three of the same thing.</p>
+        </div>
+        <button class="btn btn-primary" id="addGiftBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Add a gift
+        </button>
+      </div>
+
+      <div class="guard-note reveal">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6.5v5c0 4.6 3.1 8.3 7.5 9.5 4.4-1.2 7.5-4.9 7.5-9.5v-5L12 3Z"/><path d="M9.2 12.2 11 14l3.8-3.9"/></svg>
+        <span>Duplicate guard is on — every new gift is checked against your existing list.</span>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar reveal">
+        <div class="chips" id="chips" role="group" aria-label="Filter gifts by room"></div>
+
+        <div class="tools">
+          <div class="search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" id="searchInput" placeholder="Search gifts…" aria-label="Search gifts by name">
+          </div>
+          <select id="sortSel" aria-label="Sort gifts">
+            <option value="featured">Sort: Featured</option>
+            <option value="price-asc">Price: low → high</option>
+            <option value="price-desc">Price: high → low</option>
+            <option value="name">Name: A → Z</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="gift-grid" id="giftGrid" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ======================= CHECKLIST ======================= -->
+  <section class="section" id="checklist" style="background:color-mix(in srgb,var(--bg-alt) 55%,var(--bg))">
+    <div class="container">
+      <div class="sec-head reveal">
+        <div>
+          <span class="kicker">The checklist</span>
+          <h2>Host without the last-minute panic</h2>
+          <p>Everything from "book the movers" to "chill the wine" — grouped by phase and saved automatically on your device.</p>
+        </div>
+      </div>
+
+      <div class="checklist-wrap">
+        <!-- Progress panel -->
+        <aside class="progress-panel reveal" aria-label="Checklist progress">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 150 150" aria-hidden="true">
+              <defs>
+                <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#C2410C"/>
+                  <stop offset="100%" stop-color="#EA6A32"/>
+                </linearGradient>
+              </defs>
+              <circle class="track" cx="75" cy="75" r="63"></circle>
+              <circle class="value" id="ringValue" cx="75" cy="75" r="63"
+                      stroke-dasharray="395.8" stroke-dashoffset="395.8"></circle>
+            </svg>
+            <div class="ring-label">
+              <b id="ringPct">0%</b>
+              <span>Complete</span>
+            </div>
+          </div>
+
+          <div>
+            <h3 id="taskHeadline">Let's get started</h3>
+            <p id="taskSub">0 of 0 tasks done</p>
+          </div>
+
+          <form class="task-add" id="taskForm">
+            <label for="taskInput" class="visually-hidden" style="position:absolute;left:-9999px">New task</label>
+            <input id="taskInput" type="text" placeholder="Add a task…" maxlength="90" required>
+            <select id="taskCat" aria-label="Task category"></select>
+            <button class="btn btn-primary btn-sm" type="submit" aria-label="Add task">Add</button>
+          </form>
+        </aside>
+
+        <!-- Task groups -->
+        <div class="task-groups reveal" id="taskGroups"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= HOW IT WORKS ======================= -->
+  <section class="section" id="how">
+    <div class="container">
+      <div class="sec-head reveal">
+        <div>
+          <span class="kicker">How it works</span>
+          <h2>Three steps, zero duplicates</h2>
+        </div>
+      </div>
+
+      <div class="steps">
+        <article class="step reveal">
+          <span class="step-num">01</span>
+          <h3>Build your list</h3>
+          <p>Add the things your new home is missing. The duplicate guard checks each entry against what's already there.</p>
+        </article>
+        <article class="step reveal">
+          <span class="step-num">02</span>
+          <h3>Share with guests</h3>
+          <p>Guests browse by room and claim a gift in one tap. Claimed items lock instantly for everyone else.</p>
+        </article>
+        <article class="step reveal">
+          <span class="step-num">03</span>
+          <h3>Run the party</h3>
+          <p>Work through the checklist phase by phase. Everything saves locally, so you can close the tab and come back.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ======================= FOOTER ======================= -->
+<footer class="site-footer">
+  <div class="container foot-grid">
+    <div>
+      <a href="#top" class="brand" aria-label="Hearthlist">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg>
+        </span>
+        <span>Hearthlist</span>
+      </a>
+      <p>A smarter housewarming registry and party checklist. Built with semantic HTML, modern CSS and vanilla JavaScript — no frameworks, no tracking.</p>
+    </div>
+
+    <nav class="foot-links" aria-label="Footer">
+      <a href="#registry">Registry</a>
+      <a href="#checklist">Checklist</a>
+      <a href="#how">How it works</a>
+      <button class="reset-btn" id="resetBtn">Reset demo data</button>
+    </nav>
+  </div>
+</footer>
+
+<!-- ======================= ADD GIFT DIALOG ======================= -->
+<dialog id="giftDialog" aria-labelledby="giftDialogTitle">
+  <form class="modal" id="giftForm" method="dialog" novalidate>
+    <div class="modal-head">
+      <div>
+        <h3 id="giftDialogTitle">Add a gift</h3>
+        <p>We'll check it against your list before adding.</p>
+      </div>
+      <button type="button" class="modal-close" id="closeGiftDialog" aria-label="Close dialog">✕</button>
+    </div>
+
+    <div class="warn-box" id="dupWarn" role="alert">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      <span id="dupWarnText"></span>
+    </div>
+
+    <div class="field">
+      <label for="giftName">Gift name</label>
+      <input id="giftName" name="name" type="text" placeholder="e.g. Cast Iron Dutch Oven" required maxlength="60" autocomplete="off">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="giftCat">Room</label>
+        <select id="giftCat" name="cat" required>
+          <option value="Kitchen">Kitchen</option>
+          <option value="Bedroom">Bedroom</option>
+          <option value="Living">Living</option>
+          <option value="Bath">Bath</option>
+          <option value="Entry">Entry</option>
+          <option value="Utility">Utility</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="giftPrice">Price (₹)</label>
+        <input id="giftPrice" name="price" type="number" min="0" max="9999999" step="1" placeholder="e.g. 2500" required>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="giftNote">Note <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+      <input id="giftNote" name="note" type="text" placeholder="Colour, size, or a helpful hint" maxlength="70" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label id="emojiLabel">Pick an icon</label>
+      <div class="emoji-row" id="emojiRow" role="group" aria-labelledby="emojiLabel"></div>
+      <input type="hidden" id="giftEmoji" value="🎁">
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="cancelGift">Cancel</button>
+      <button type="submit" class="btn btn-primary">Add to registry</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+/* ============================================================
+   HEARTHLIST — Application logic
+   ============================================================ */
+(function () {
+  'use strict';
+
+  /* ---------- Helpers ---------- */
+  const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const uid = () => Math.random().toString(36).slice(2, 9);
+
+  /* Indian Rupee formatter with Indian digit grouping (e.g. ₹1,23,456) */
+  const money = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  });
+
+  const esc = (str = '') => String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+  const STORAGE_KEY = 'hearthlist.v1';
+
+  /* ---------- Seed data (prices in ₹) ---------- */
+  const ROOMS = ['Kitchen', 'Bedroom', 'Living', 'Bath', 'Entry', 'Utility'];
+
+  const SEED_GIFTS = [
+    ['Stand Mixer',          'Kitchen', 37000, '🥣', 'Artisan, 5-quart',         true,  'Priya'],
+    ['Cast Iron Dutch Oven', 'Kitchen', 10700, '🍲', '6-quart, enamelled',       false, ''],
+    ['Air Fryer',            'Kitchen',  9900, '🍟', 'Dual basket, 8-quart',      false, ''],
+    ['Espresso Machine',     'Kitchen', 29000, '☕', 'Semi-automatic',            true,  'Marco'],
+    ["Chef's Knife Set",     'Kitchen', 15700, '🔪', '3-piece, high-carbon',      false, ''],
+    ['Dinnerware Set',       'Kitchen', 12000, '🍽️', 'Service for 8, stoneware',  false, ''],
+    ['Wine Glasses',         'Kitchen',  5600, '🍷', 'Set of 6, crystal',         false, ''],
+    ['Egyptian Cotton Sheets','Bedroom',13200, '🛏️', 'Queen, 400 thread',         true,  'Ana'],
+    ['Linen Duvet Cover',    'Bedroom', 10700, '🧺', 'Sage, queen',               false, ''],
+    ['Memory Foam Pillows',  'Bedroom',  7400, '💤', 'Set of 2',                  false, ''],
+    ['Blackout Curtains',    'Bedroom',  6100, '🪟', 'Pair, 84-inch',             false, ''],
+    ['Round Wall Mirror',    'Living',  11500, '🪞', '30-inch, brass frame',      false, ''],
+    ['Area Rug 5×8',         'Living',  19000, '🧶', 'Wool, oatmeal',             false, ''],
+    ['Floor Lamp',           'Living',  12400, '💡', 'Arc, matte black',          true,  'Jordan'],
+    ['Bookshelf',            'Living',  16500, '📚', '5-tier, walnut',            false, ''],
+    ['Throw Blanket',        'Living',   4900, '🧣', 'Chunky knit, cream',        false, ''],
+    ['Indoor Plant Set',     'Living',   5300, '🪴', '3 potted plants',           false, ''],
+    ['Bath Towel Set',       'Bath',     6600, '🛁', '6-piece, Turkish cotton',   true,  'Sam'],
+    ['Shower Curtain',       'Bath',     3200, '🚿', 'Waffle weave, white',       false, ''],
+    ['Soap Dispenser Set',   'Bath',     2400, '🧴', 'Ceramic, pair',             false, ''],
+    ['Welcome Mat',          'Entry',    2800, '🚪', 'Coir, 30×18',               false, ''],
+    ['Coat Rack',            'Entry',    7400, '🧥', 'Standing, oak',             false, ''],
+    ['Smart Doorbell',       'Entry',   12400, '🔔', 'Video, 2K',                 false, ''],
+    ['Tool Kit',             'Utility',  8200, '🔧', '60-piece household',        false, ''],
+    ['First Aid Kit',        'Utility',  2800, '🩹', '120-piece',                 false, ''],
+    ['Vacuum Cleaner',       'Utility', 20700, '🧹', 'Cordless stick',            false, '']
+  ];
+
+  const TASK_CATS = ['Before the Party', 'Food & Drink', 'Decor & Ambience', 'Day Of', 'After the Party'];
+
+  const SEED_TASKS = [
+    ['Confirm the date and send invitations', 'Before the Party', true],
+    ['Deep clean the kitchen and bathrooms',  'Before the Party', true],
+    ['Unpack the last of the moving boxes',   'Before the Party', false],
+    ['Set up a coat and shoe drop-off zone',  'Before the Party', false],
+    ['Share the registry link with guests',   'Before the Party', true],
+    ['Plan the menu and count guests',        'Food & Drink',     true],
+    ['Order the welcome cake',                'Food & Drink',     false],
+    ['Buy wine, beer and soft drinks',        'Food & Drink',     false],
+    ['Prep a vegetarian option',              'Food & Drink',     false],
+    ['Chill drinks the night before',         'Food & Drink',     false],
+    ['Hang fairy lights in the living room',  'Decor & Ambience', false],
+    ['Place fresh flowers on the table',      'Decor & Ambience', false],
+    ['Set out candles and matchsticks',       'Decor & Ambience', false],
+    ['Create a simple welcome sign',          'Decor & Ambience', false],
+    ['Make a party playlist',                 'Decor & Ambience', true],
+    ['Set up the gift table with a sign',     'Day Of',           false],
+    ['Lay out snacks and drinks station',     'Day Of',           false],
+    ['Put out extra toilet paper and towels', 'Day Of',           false],
+    ['Greet guests and give the house tour',  'Day Of',           false],
+    ['Take photos of the celebration',        'Day Of',           false],
+    ['Thank guests and note who gave what',   'After the Party',  false],
+    ['Wash dishes and store leftovers',       'After the Party',  false],
+    ['Recycle bottles and packaging',         'After the Party',  false],
+    ['Send thank-you messages',               'After the Party',  false]
+  ];
+
+  /* ---------- State ---------- */
+  let state = {
+    gifts: [],
+    tasks: [],
+    filter: 'All',
+    search: '',
+    sort: 'featured',
+    theme: 'light'
+  };
+
+  function buildSeed() {
+    state.gifts = SEED_GIFTS.map(([name, cat, price, emoji, note, claimed, by]) => ({
+      id: uid(), name, cat, price, emoji, note, claimed, by
+    }));
+    state.tasks = SEED_TASKS.map(([text, cat, done]) => ({
+      id: uid(), text, cat, done
+    }));
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) { buildSeed(); return; }
+      const saved = JSON.parse(raw);
+      if (!Array.isArray(saved.gifts) || !Array.isArray(saved.tasks)) { buildSeed(); return; }
+      state.gifts = saved.gifts;
+      state.tasks = saved.tasks;
+      state.theme = saved.theme || 'light';
+    } catch { buildSeed(); }
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        gifts: state.gifts, tasks: state.tasks, theme: state.theme
+      }));
+    } catch { /* storage may be unavailable — fail silently */ }
+  }
+
+  /* ---------- Toast ---------- */
+  function toast(message, ok = true) {
+    const wrap = $('#toastWrap');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.innerHTML = ok
+      ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>${esc(message)}</span>`
+      : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5M12 16h.01"/><circle cx="12" cy="12" r="9"/></svg><span>${esc(message)}</span>`;
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), 3600);
+  }
+
+  /* ---------- Duplicate similarity ---------- */
+  function tokens(str) {
+    return String(str).toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+  }
+  function similarity(a, b) {
+    const A = new Set(tokens(a)), B = new Set(tokens(b));
+    if (!A.size || !B.size) return 0;
+    let inter = 0;
+    A.forEach(w => { if (B.has(w)) inter++; });
+    return inter / Math.max(A.size, B.size);
+  }
+  function findDuplicate(name, excludeId = null) {
+    let best = null, bestScore = 0;
+    for (const g of state.gifts) {
+      if (g.id === excludeId) continue;
+      const s = similarity(name, g.name);
+      if (s > bestScore) { bestScore = s; best = g; }
+    }
+    return bestScore >= 0.5 ? best : null;
+  }
+
+  /* ============================================================
+     RENDER — REGISTRY
+     ============================================================ */
+  function renderChips() {
+    const counts = { All: state.gifts.length };
+    ROOMS.forEach(r => counts[r] = state.gifts.filter(g => g.cat === r).length);
+
+    $('#chips').innerHTML = ['All', ...ROOMS].map(room => `
+      <button class="chip" data-room="${room}" aria-pressed="${state.filter === room}">
+        ${room}<span class="count">${counts[room] || 0}</span>
+      </button>`).join('');
+  }
+
+  function giftCard(g, index) {
+    const cat = g.cat.toLowerCase();
+    return `
+      <article class="gift-card ${g.claimed ? 'is-claimed' : ''}" data-id="${g.id}" data-cat="${cat}"
+               style="animation-delay:${Math.min(index * 35, 320)}ms">
+        <div class="gift-tile">
+          <span class="gift-badge">${g.claimed ? 'Claimed' : 'Available'}</span>
+          <button class="icon-btn" data-act="delete" aria-label="Remove ${esc(g.name)} from registry">✕</button>
+          <span class="gift-emoji" aria-hidden="true">${g.emoji}</span>
+        </div>
+        <div class="gift-body">
+          <span class="gift-cat">${esc(g.cat)}</span>
+          <h3>${esc(g.name)}</h3>
+          <p class="gift-note">${g.claimed && g.by ? `Reserved by ${esc(g.by)}` : esc(g.note || '')}</p>
+          <div class="gift-foot">
+            <span class="price">${money.format(g.price)}</span>
+            <button class="btn-claim" data-act="claim">
+              ${g.claimed ? 'Release' : 'Claim gift'}
+            </button>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  function renderGifts() {
+    const q = state.search.trim().toLowerCase();
+
+    let list = state.gifts.filter(g =>
+      (state.filter === 'All' || g.cat === state.filter) &&
+      (!q || g.name.toLowerCase().includes(q) || (g.note || '').toLowerCase().includes(q))
+    );
+
+    switch (state.sort) {
+      case 'price-asc':  list.sort((a, b) => a.price - b.price); break;
+      case 'price-desc': list.sort((a, b) => b.price - a.price); break;
+      case 'name':       list.sort((a, b) => a.name.localeCompare(b.name)); break;
+      default:           list.sort((a, b) => Number(a.claimed) - Number(b.claimed));
+    }
+
+    const grid = $('#giftGrid');
+    grid.innerHTML = list.length
+      ? list.map(giftCard).join('')
+      : `<div class="empty"><span>🔍</span>No gifts match “${esc(state.search || state.filter)}”. Try another room or search term.</div>`;
+
+    renderChips();
+    updateStats();
+  }
+
+  function updateStats() {
+    const total = state.gifts.length;
+    const claimed = state.gifts.filter(g => g.claimed).length;
+    const pct = total ? Math.round((claimed / total) * 100) : 0;
+
+    $('#statGifts').textContent = total;
+    $('#statClaimed').textContent = claimed;
+    $('#statTasks').textContent = state.tasks.filter(t => !t.done).length;
+
+    $('#previewPct').textContent = pct + '%';
+    $('#previewBar').style.width = pct + '%';
+  }
+
+  /* ============================================================
+     RENDER — CHECKLIST
+     ============================================================ */
+  function renderTasks() {
+    const groups = $('#taskGroups');
+    const total = state.tasks.length;
+    const done = state.tasks.filter(t => t.done).length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+
+    groups.innerHTML = TASK_CATS.map(cat => {
+      const items = state.tasks.filter(t => t.cat === cat);
+      if (!items.length) return '';
+      const doneCount = items.filter(t => t.done).length;
+
+      const icons = {
+        'Before the Party': '📋',
+        'Food & Drink': '🍽️',
+        'Decor & Ambience': '✨',
+        'Day Of': '🎉',
+        'After the Party': '🧽'
+      };
+
+      return `
+        <article class="task-group">
+          <div class="tg-head">
+            <h4><i aria-hidden="true">${icons[cat] || '•'}</i>${cat}</h4>
+            <span class="tg-count">${doneCount}/${items.length}</span>
+          </div>
+          <ul class="task-list">
+            ${items.map(t => `
+              <li class="task ${t.done ? 'done' : ''}" data-id="${t.id}">
+                <label>
+                  <input type="checkbox" ${t.done ? 'checked' : ''} data-act="toggle">
+                  <span class="box" aria-hidden="true"></span>
+                  <span class="task-text">${esc(t.text)}</span>
+                </label>
+                <button class="task-del" data-act="deltask" aria-label="Delete task: ${esc(t.text)}">✕</button>
+              </li>`).join('')}
+          </ul>
+        </article>`;
+    }).join('');
+
+    // Ring
+    const R = 63, C = 2 * Math.PI * R;
+    $('#ringValue').setAttribute('stroke-dasharray', C.toFixed(1));
+    $('#ringValue').setAttribute('stroke-dashoffset', (C * (1 - pct / 100)).toFixed(1));
+    $('#ringPct').textContent = pct + '%';
+    $('#taskSub').textContent = `${done} of ${total} tasks done`;
+
+    const headline = pct === 100 ? 'All set — enjoy the party! 🎉'
+      : pct >= 60 ? 'Almost there!'
+      : pct >= 25 ? 'Making good progress'
+      : "Let's get started";
+    $('#taskHeadline').textContent = headline;
+
+    updateStats();
+  }
+
+  function renderTaskCatSelect() {
+    $('#taskCat').innerHTML = TASK_CATS
+      .map(c => `<option value="${esc(c)}">${esc(c.split(' ')[0])}</option>`).join('');
+  }
+
+  /* ============================================================
+     THEME
+     ============================================================ */
+  function applyTheme(theme) {
+    state.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = $('#themeToggle');
+    btn.setAttribute('aria-pressed', String(theme === 'dark'));
+    btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+
+  /* ============================================================
+     EVENT WIRING
+     ============================================================ */
+  function wireEvents() {
+
+    /* --- Theme --- */
+    $('#themeToggle').addEventListener('click', () => {
+      applyTheme(state.theme === 'dark' ? 'light' : 'dark');
+      save();
+    });
+
+    /* --- Registry filters --- */
+    $('#chips').addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      state.filter = chip.dataset.room;
+      renderGifts();
+    });
+
+    let searchTimer;
+    $('#searchInput').addEventListener('input', e => {
+      clearTimeout(searchTimer);
+      const val = e.target.value;
+      searchTimer = setTimeout(() => { state.search = val; renderGifts(); }, 160);
+    });
+
+    $('#sortSel').addEventListener('change', e => {
+      state.sort = e.target.value;
+      renderGifts();
+    });
+
+    /* --- Gift card actions (delegated) --- */
+    $('#giftGrid').addEventListener('click', e => {
+      const btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      const card = btn.closest('.gift-card');
+      if (!card) return;
+      const id = card.dataset.id;
+      const gift = state.gifts.find(g => g.id === id);
+      if (!gift) return;
+
+      if (btn.dataset.act === 'claim') {
+        gift.claimed = !gift.claimed;
+        gift.by = gift.claimed ? 'You' : '';
+        save();
+        renderGifts();
+        toast(gift.claimed ? `“${gift.name}” reserved for you` : `“${gift.name}” is available again`);
+      }
+
+      if (btn.dataset.act === 'delete') {
+        state.gifts = state.gifts.filter(g => g.id !== id);
+        save();
+        renderGifts();
+        toast(`Removed “${gift.name}”`);
+      }
+    });
+
+    /* --- Checklist actions (delegated) --- */
+    const groups = $('#taskGroups');
+
+    groups.addEventListener('change', e => {
+      const input = e.target.closest('input[data-act="toggle"]');
+      if (!input) return;
+      const li = input.closest('.task');
+      const task = state.tasks.find(t => t.id === li.dataset.id);
+      if (!task) return;
+      task.done = input.checked;
+      save();
+      renderTasks();
+    });
+
+    groups.addEventListener('click', e => {
+      const btn = e.target.closest('[data-act="deltask"]');
+      if (!btn) return;
+      const li = btn.closest('.task');
+      state.tasks = state.tasks.filter(t => t.id !== li.dataset.id);
+      save();
+      renderTasks();
+      toast('Task removed');
+    });
+
+    /* --- Add task --- */
+    $('#taskForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const input = $('#taskInput');
+      const text = input.value.trim();
+      if (!text) { input.focus(); return; }
+      state.tasks.push({ id: uid(), text, cat: $('#taskCat').value || TASK_CATS[0], done: false });
+      input.value = '';
+      save();
+      renderTasks();
+      toast('Task added to the checklist');
+    });
+
+    /* --- Gift dialog --- */
+    const dialog = $('#giftDialog');
+    const form = $('#giftForm');
+    const dupWarn = $('#dupWarn');
+    const dupWarnText = $('#dupWarnText');
+    let dupAcknowledged = false;
+
+    const EMOJIS = ['🎁','🥣','🍲','☕','🍽️','🔪','🍷','🛏️','🧺','💤','🪟','🪞','🧶','💡','📚','🪴','🛁','🚿','🧴','🚪','🧥','🔔','🔧','🩹','🧹','🖼️','🕯️','🧊'];
+
+    function buildEmojiRow() {
+      const row = $('#emojiRow');
+      row.innerHTML = EMOJIS.map((em, i) =>
+        `<button type="button" class="emoji-pick" data-emoji="${em}" aria-pressed="${i === 0}">${em}</button>`
+      ).join('');
+      $('#giftEmoji').value = EMOJIS[0];
+    }
+
+    $('#emojiRow').addEventListener('click', e => {
+      const b = e.target.closest('.emoji-pick');
+      if (!b) return;
+      $$('.emoji-pick').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+      $('#giftEmoji').value = b.dataset.emoji;
+    });
+
+    function openDialog() {
+      form.reset();
+      dupWarn.classList.remove('show');
+      dupAcknowledged = false;
+      buildEmojiRow();
+      dialog.showModal();
+      setTimeout(() => $('#giftName').focus(), 80);
+    }
+
+    $('#addGiftBtn').addEventListener('click', openDialog);
+    $('#closeGiftDialog').addEventListener('click', () => dialog.close());
+    $('#cancelGift').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });
+
+    // Live duplicate check
+    $('#giftName').addEventListener('input', () => {
+      const name = $('#giftName').value.trim();
+      if (name.length < 3) { dupWarn.classList.remove('show'); dupAcknowledged = false; return; }
+      const dup = findDuplicate(name);
+      if (dup && !dupAcknowledged) {
+        dupWarnText.textContent = `Heads up — “${dup.name}” is already on your registry. Submit again to add it anyway.`;
+        dupWarn.classList.add('show');
+      } else {
+        dupWarn.classList.remove('show');
+      }
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const name = $('#giftName').value.trim();
+      const cat = $('#giftCat').value;
+      const priceRaw = $('#giftPrice').value;
+      const price = Number(priceRaw);
+      const note = $('#giftNote').value.trim();
+      const emoji = $('#giftEmoji').value || '🎁';
+
+      if (!name) { toast('Please enter a gift name', false); $('#giftName').focus(); return; }
+      if (priceRaw === '' || Number.isNaN(price) || price < 0) {
+        toast('Please enter a valid price', false); $('#giftPrice').focus(); return;
+      }
+
+      const dup = findDuplicate(name);
+      if (dup && !dupAcknowledged) {
+        dupAcknowledged = true;
+        dupWarnText.textContent = `“${dup.name}” is already listed. Press “Add to registry” again to add it anyway.`;
+        dupWarn.classList.add('show');
+        return;
+      }
+
+      state.gifts.unshift({ id: uid(), name, cat, price, emoji, note, claimed: false, by: '' });
+      save();
+      dialog.close();
+      state.filter = 'All';
+      state.search = '';
+      $('#searchInput').value = '';
+      renderGifts();
+      toast(`“${name}” added to the registry`);
+    });
+
+    /* --- Reset --- */
+    $('#resetBtn').addEventListener('click', () => {
+      if (!confirm('Reset the registry and checklist back to the demo data?')) return;
+      buildSeed();
+      state.filter = 'All'; state.search = ''; state.sort = 'featured';
+      $('#searchInput').value = '';
+      $('#sortSel').value = 'featured';
+      save();
+      renderGifts();
+      renderTasks();
+      toast('Demo data restored');
+    });
+  }
+
+  /* ============================================================
+     SCROLL REVEAL
+     ============================================================ */
+  function initReveal() {
+    const items = $$('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      items.forEach(i => i.classList.add('in'));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    items.forEach(i => io.observe(i));
+  }
+
+  /* ============================================================
+     INIT
+     ============================================================ */
+  function init() {
+    load();
+    applyTheme(state.theme || 'light');
+    renderTaskCatSelect();
+    renderGifts();
+    renderTasks();
+    wireEvents();
+    initReveal();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
